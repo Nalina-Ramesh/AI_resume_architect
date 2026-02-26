@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens */
+
+:root {
+  color-scheme: light;
+
+  --primary: 238 84% 67%;
+  --primary-light: 238 100% 79%;
+  --primary-dark: 248 73% 55%;
+
+  --background: 210 40% 98%;
+  --card-bg: 210 40% 99%;
+  --border-soft: 215 20% 89%;
+
+  --text-main: 222 47% 16%;
+  --text-muted: 215 15% 52%;
+
+  --success: 152 60% 45%;
+  --danger: 0 72% 55%;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 18px 30px rgba(15, 23, 42, 0.1);
+  --shadow-xl: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+body {
+  @apply font-sans antialiased;
+  background-color: hsl(var(--background));
+  color: hsl(var(--text-main));
+}
+
+/* Subtle noise overlay on the app shell */
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.2;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.28'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+@layer components {
+  .cf-container {
+    @apply mx-auto w-full max-w-7xl px-6 lg:px-12;
+  }
+
+  .gradient-primary {
+    @apply bg-gradient-to-r from-brand-500 via-purple-500 to-brand-600;
+  }
+
+  .cf-card {
+    background-color: hsl(var(--card-bg) / 0.9);
+    border-radius: var(--radius-xl);
+    border: 1px solid hsl(var(--border-soft) / 0.7);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(18px);
+    @apply relative overflow-hidden transition-all duration-300 ease-in-out;
+  }
+
+  .cf-card-hover {
+    @apply hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:scale-[1.02];
+  }
+
+  .cf-gradient-border {
+    position: relative;
+    border-radius: var(--radius-xl);
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(129, 140, 248, 0.9), rgba(236, 72, 153, 0.8));
+  }
+
+  .cf-gradient-border > .cf-card-inner {
+    border-radius: inherit;
+    background: radial-gradient(circle at top left, rgba(129, 140, 248, 0.08), transparent),
+      hsl(var(--card-bg));
+    @apply h-full w-full;
+  }
+
+  .cf-btn {
+    @apply relative inline-flex items-center justify-center gap-1.5 text-sm font-medium
+      rounded-full px-4 py-2.5 transition-all duration-300 ease-in-out
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+      disabled:cursor-not-allowed disabled:opacity-60;
+    transform-origin: center;
+  }
+
+  .cf-btn-primary {
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-dark))
+    );
+    color: white;
+    box-shadow: 0 18px 45px rgba(99, 102, 241, 0.35);
+    @apply focus-visible:ring-indigo-400 focus-visible:ring-offset-slate-50;
+  }
+
+  .cf-btn-primary:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 20px 50px rgba(99, 102, 241, 0.45);
+    transform: translateY(-1px) scale(1.01);
+  }
+
+  .cf-btn-primary:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.18);
+  }
+
+  .cf-btn-ghost {
+    @apply border border-slate-200/80 bg-white/60 text-slate-700
+      hover:bg-slate-100/70 hover:border-slate-300;
+  }
+
+  .cf-btn-outline {
+    @apply border border-slate-300/80 bg-white text-slate-900
+      hover:bg-slate-50;
+  }
+
+  .cf-btn-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cf-btn-ripple::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 10%, transparent 60%);
+    opacity: 0;
+    transform: scale(0.2);
+    transition: opacity 350ms ease-out, transform 350ms ease-out;
+  }
+
+  .cf-btn-ripple:active::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .cf-field {
+    @apply relative w-full;
+  }
+
+  .cf-field-input {
+    @apply block w-full rounded-xl border border-slate-200/80 bg-white/70 px-3.5 pt-4 pb-1.5
+      text-sm text-slate-900 placeholder-transparent
+      shadow-[inset_0_0_0_1px_rgba(148,163,184,0.15)]
+      transition-all duration-300 ease-in-out;
+  }
+
+  .cf-field-input:focus {
+    @apply border-transparent outline-none ring-2 ring-indigo-400/70 ring-offset-[1px]
+      ring-offset-slate-50;
+    box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.35), var(--shadow-sm);
+  }
+
+  .cf-field-label {
+    @apply pointer-events-none absolute left-3.5 top-2 origin-left
+      text-xs font-medium text-slate-500
+      transition-all duration-300 ease-in-out;
+  }
+
+  .cf-field-input::placeholder {
+    @apply text-slate-400;
+  }
+
+  .cf-field-input:not(:placeholder-shown) + .cf-field-label,
+  .cf-field-input:focus + .cf-field-label {
+    @apply translate-y-[-0.35rem] scale-90 text-slate-500;
+  }
+
+  .cf-skeleton {
+    @apply animate-pulse rounded-lg bg-slate-200/70;
+  }
+
+  .cf-page {
+    @apply opacity-0 translate-y-4 animate-cf-fade-in-up;
+  }
+}
+
+@layer utilities {
+  @keyframes cf-fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-cf-fade-in-up {
+    animation: cf-fade-in-up 400ms cubic-bezier(0.21, 0.8, 0.35, 1) forwards;
+  }
+
+  .bg-hero-animated {
+    background-image: radial-gradient(circle at top left, rgba(129, 140, 248, 0.18), transparent 55%),
+      radial-gradient(circle at bottom right, rgba(236, 72, 153, 0.16), transparent 50%),
+      linear-gradient(135deg, #f1f5f9, #e5e7eb);
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)];
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(148 163 184);
+    border-radius: 9999px;
+  }
+}
