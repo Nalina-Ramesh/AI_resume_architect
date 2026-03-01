@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import UserDropdown from './UserDropdown';
 
 const pageTitles = {
   '/app': 'Home',
@@ -17,31 +18,45 @@ const Navbar = () => {
   const title = pageTitles[location.pathname] || 'Dashboard';
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur">
-      <div className="flex items-center justify-between px-4 py-3 md:px-8">
+    <header className="relative sticky top-0 z-40">
+
+      {/* Background blur layer */}
+      <div className="absolute inset-0 bg-[#0f0f13]/80 backdrop-blur-xl border-b border-white/10" />
+
+      {/* Subtle glow */}
+      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[500px] h-[120px] bg-indigo-600/10 blur-[80px]" />
+
+      <div className="relative flex items-center justify-between px-6 py-4 md:px-10">
+
+        {/* LEFT TITLE SECTION */}
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
+          <p className="text-xs uppercase tracking-[0.25em] text-indigo-400">
             Overview
           </p>
-          <h1 className="text-lg font-semibold text-slate-900 md:text-xl">{title}</h1>
+
+          <h1 className="mt-1 text-xl md:text-2xl font-semibold text-white tracking-tight">
+            {title}
+          </h1>
         </div>
-        <div className="flex items-center gap-4">
+
+        {/* RIGHT SECTION */}
+        <div className="flex items-center gap-6">
+
+          {/* Upgrade Button */}
           <Link
             to="/pricing"
-            className="hidden rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 md:inline-flex"
+            className="hidden md:inline-flex items-center px-5 py-2 text-sm font-medium rounded-full 
+                       bg-gradient-to-r from-indigo-500 to-purple-600 
+                       hover:scale-105 transition-all duration-300 shadow-lg"
           >
             Upgrade
           </Link>
-          <Link to="/app/profile" className="flex items-center gap-3">
-            <div className="text-right text-xs">
-              <p className="font-medium text-slate-900">Alex Candidate</p>
-              <p className="text-slate-500">Product Designer</p>
-            </div>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-tr from-brand-500 to-purple-500 text-xs font-semibold text-white">
-              AC
-            </div>
-          </Link>
+
+          {/* User Dropdown */}
+          <UserDropdown />
+
         </div>
+
       </div>
     </header>
   );

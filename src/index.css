@@ -5,18 +5,17 @@
 /* Design tokens */
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+
+  --background: 240 10% 6%;
+  --card-bg: 240 10% 10%;
+  --border-soft: 240 6% 20%;
+
+  --text-main: 0 0% 98%;
+  --text-muted: 240 5% 65%;
 
   --primary: 238 84% 67%;
-  --primary-light: 238 100% 79%;
   --primary-dark: 248 73% 55%;
-
-  --background: 210 40% 98%;
-  --card-bg: 210 40% 99%;
-  --border-soft: 215 20% 89%;
-
-  --text-main: 222 47% 16%;
-  --text-muted: 215 15% 52%;
 
   --success: 152 60% 45%;
   --danger: 0 72% 55%;
@@ -32,10 +31,14 @@
   --shadow-xl: 0 8px 30px rgba(0, 0, 0, 0.06);
 }
 
+html, body, #root {
+  height: 100%;
+  background-color: #0f0f13;
+  color: white;
+}
+
 body {
   @apply font-sans antialiased;
-  background-color: hsl(var(--background));
-  color: hsl(var(--text-main));
 }
 
 /* Subtle noise overlay on the app shell */
@@ -220,4 +223,18 @@ body {
     background-color: rgb(148 163 184);
     border-radius: 9999px;
   }
+}
+@keyframes dropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-dropdown {
+  animation: dropdown 0.18s ease-out;
 }
