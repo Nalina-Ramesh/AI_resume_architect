@@ -83,13 +83,13 @@ const UserDropdown = () => {
               />
 
                 <MenuItem
-                label="My Messages"
-                onClick={() => navigate('/app/messages')}
+                label="AI Chatbot"
+                onClick={() => navigate('/app/chatbot')}
                 />
 
                 <MenuItem
-                label="My Tasks"
-                onClick={() => navigate('/app/tasks')}
+                label="History"
+                onClick={() => navigate('/app/history')}
                 />
 
               <div className="my-2 border-t border-white/10" />

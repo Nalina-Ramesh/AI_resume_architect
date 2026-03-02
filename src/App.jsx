@@ -13,8 +13,8 @@ import Pricing from './pages/Pricing';
 import Profile from './pages/Profile';
 import DashboardLayout from './layout/DashboardLayout';
 import ProtectedRoute from './routes/ProtectedRoute';
-import Messages from './pages/Messages';
-import Tasks from './pages/Tasks';
+import Chatbot from './pages/chatbot';
+import History from './pages/history';
 
 const App = () => {
   // UI-only placeholder – replace with real auth later
@@ -45,8 +45,8 @@ const App = () => {
           <Route path="ats-score" element={<ATSPage />} />
           <Route path="cover-letter" element={<CoverLetter />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="/app/messages" element={<Messages />} />
-          <Route path="/app/tasks" element={<Tasks />} />
+          <Route path="chatbot" element={<Chatbot />} />
+      <Route path="history" element={<History />} />
         </Route>
 
         <Route path="*" element={<Landing />} />
