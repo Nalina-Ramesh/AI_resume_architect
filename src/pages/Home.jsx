@@ -125,7 +125,7 @@ const Home = () => {
           </p>
 
           <h2 className="mt-3 text-2xl md:text-3xl font-semibold leading-tight">
-            Hey Alex,
+            Welcome back,
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
               Ready to ship your next application?
             </span>
@@ -162,7 +162,7 @@ const Home = () => {
               Next best action
             </p>
             <p className="mt-2 font-semibold text-white">
-              Finish your “Figma · Senior Product Designer” application.
+              Tailor your resume for your highest-priority role this week.
             </p>
           </div>
 
@@ -171,7 +171,7 @@ const Home = () => {
               Quick stats
             </p>
             <p className="mt-2 text-gray-300">
-              3 active resumes · 5 ATS runs · 2 cover letters
+              Your recent resume, ATS, and cover-letter activity appears here.
             </p>
           </div>
 
@@ -267,4 +267,3 @@ const Home = () => {
 };
 
 export default Home;
-

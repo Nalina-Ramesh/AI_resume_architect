@@ -1,296 +1,227 @@
-/*import React from 'react';
-import { Link } from 'react-router-dom';
-import Card from '../components/Card';
-import ATSProgressCircle from '../components/ATSProgressCircle';
-import Button from '../components/Button';
+import React, { useState } from "react";
+import API from "../api/api";
+import Card from "../components/Card";
+import Button from "../components/Button";
+import ATSProgressCircle from "../components/ATSProgressCircle";
+import { Link } from "react-router-dom";
 
 const ATSPage = () => {
-  const matchedKeywords = ['Product discovery', 'Design systems', 'Stakeholder management'];
-  const missingKeywords = ['A/B testing', 'Accessibility', 'Journey mapping'];
 
-  return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.1fr)]">
-      
-      <Card>
-        <div className="flex flex-col gap-6 md:flex-row md:items-center">
-          <div className="flex-1">
-            <Link
-              to="/app/home"
-              className="mb-2 inline-flex items-center text-xs text-slate-500 hover:text-slate-800"
-            >
-              <span className="mr-1">&#8592;</span> Back to home
-            </Link>
-            <h2 className="text-sm font-semibold text-slate-900">
-              ATS score for &quot;Senior Product Designer · Figma&quot;
-            </h2>
-            <p className="mt-1 text-xs text-slate-500">
-              This is a simulated view. Plug in your backend to calculate real scores based on JD
-              analysis.
-            </p>
-            <div className="mt-4 grid gap-3 text-xs text-slate-700 md:grid-cols-2">
-              <div className="rounded-lg bg-slate-50 px-3 py-3">
-                <p className="text-[11px] font-medium text-slate-500">
-                  Overall match quality
-                </p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
-                  Strong match · Above average
-                </p>
-                <p className="mt-1 text-slate-600">
-                  Your experience aligns well with the responsibilities and required skills.
-                </p>
-              </div>
-              <div className="rounded-lg bg-slate-50 px-3 py-3">
-                <p className="text-[11px] font-medium text-slate-500">
-                  Screening likelihood
-                </p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
-                  Likely to be seen by a recruiter
-                </p>
-                <p className="mt-1 text-slate-600">
-                  Strengthen missing keywords to increase your chances even more.
-                </p>
-              </div>
-            </div>
-            <Button className="mt-4 px-4 py-2 text-xs">Re-run analysis</Button>
-          </div>
-          <div className="flex items-center justify-center">
-            <ATSProgressCircle score={84} />
-          </div>
-        </div>
-      </Card>
+const [resumeText,setResumeText] = useState("");
+const [jobDescription,setJobDescription] = useState("");
 
-      
-      <div className="space-y-4">
-        <Card>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Keyword match
-          </h3>
-          <p className="mt-1 text-xs text-slate-600">
-            These skills and phrases appear in both the resume and the job description.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs">
-            {matchedKeywords.map((kw) => (
-              <span
-                key={kw}
-                className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
-              >
-                {kw}
-              </span>
-            ))}
-          </div>
-        </Card>
-        <Card>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Missing keywords
-          </h3>
-          <p className="mt-1 text-xs text-slate-600">
-            Consider weaving these concepts into your bullet points where they&apos;re accurate.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs">
-            {missingKeywords.map((kw) => (
-              <span
-                key={kw}
-                className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700"
-              >
-                {kw}
-              </span>
-            ))}
-          </div>
-        </Card>
-        <Card>
-          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Suggestions
-          </h3>
-          <ul className="mt-2 space-y-2 text-xs text-slate-700">
-            <li>
-              • Add at least one quantified metric related to experimentation (e.g., &quot;A/B
-              tests&quot; or &quot;conversion uplift&quot;).
-            </li>
-            <li>
-              • Call out accessibility considerations in at least one project (WCAG, inclusive
-              design, etc.).
-            </li>
-            <li>
-              • Mention cross-functional work (PM, Eng, Research) in 2–3 bullets to mirror the JD.
-            </li>
-          </ul>
-        </Card>
-      </div>
-    </div>
-  );
+const [score,setScore] = useState(0);
+const [matchedKeywords,setMatchedKeywords] = useState([]);
+const [missingKeywords,setMissingKeywords] = useState([]);
+
+const [loading,setLoading] = useState(false);
+
+const analyzeATS = async () => {
+
+if(!resumeText || !jobDescription){
+alert("Please enter resume and job description");
+return;
+}
+
+try{
+
+setLoading(true);
+
+const res = await API.post("/ats",{
+resumeText,
+jobDescription
+});
+
+setScore(res.data.score);
+setMatchedKeywords(res.data.matchedKeywords);
+setMissingKeywords(res.data.missingKeywords);
+
+setLoading(false);
+
+}catch(err){
+
+console.log(err);
+alert("Error analyzing resume");
+
+}
+
 };
 
-export default ATSPage;*/
+const scoreColor =
+score >= 85
+? "text-emerald-400"
+: score >= 70
+? "text-yellow-400"
+: "text-red-400";
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Card from '../components/Card';
-import ATSProgressCircle from '../components/ATSProgressCircle';
-import Button from '../components/Button';
+return (
 
-const ATSPage = () => {
-  const [score, setScore] = useState(84);
-  const [loading, setLoading] = useState(false);
+<div className="relative text-white space-y-8">
 
-  const matchedKeywords = ['Product discovery', 'Design systems', 'Stakeholder management'];
-  const missingKeywords = ['A/B testing', 'Accessibility', 'Journey mapping'];
+{/* Background glow */}
+<div className="absolute -top-32 -right-32 w-[450px] h-[450px] bg-indigo-600/20 blur-[160px] rounded-full" />
+<div className="absolute -bottom-32 -left-32 w-[450px] h-[450px] bg-purple-600/20 blur-[160px] rounded-full" />
 
-  const rerunAnalysis = () => {
-    setLoading(true);
+{/* Header */}
 
-    setTimeout(() => {
-      const newScore = Math.floor(Math.random() * 20) + 70;
-      setScore(newScore);
-      setLoading(false);
-    }, 1200);
-  };
+<div>
 
-  const scoreColor =
-    score >= 85
-      ? 'text-emerald-400'
-      : score >= 75
-      ? 'text-yellow-400'
-      : 'text-red-400';
+<Link
+to="/app/home"
+className="inline-flex items-center text-xs text-gray-400 hover:text-white transition"
+>
+← Back to home
+</Link>
 
-  return (
-    <div className="relative text-white space-y-8">
+<h1 className="mt-4 text-2xl font-semibold">
+ATS Resume Checker
+</h1>
 
-      {/* Background Glow */}
-      <div className="absolute -top-32 -right-32 w-[450px] h-[450px] bg-indigo-600/20 blur-[160px] rounded-full" />
-      <div className="absolute -bottom-32 -left-32 w-[450px] h-[450px] bg-purple-600/20 blur-[160px] rounded-full" />
+<p className="mt-1 text-sm text-gray-400">
+Paste your resume and job description to calculate ATS compatibility.
+</p>
 
-      {/* HEADER */}
-      <div>
-        <Link
-          to="/app/home"
-          className="inline-flex items-center text-xs text-gray-400 hover:text-white transition"
-        >
-          ← Back to home
-        </Link>
+</div>
 
-        <h1 className="mt-4 text-2xl font-semibold">
-          ATS Analysis Report
-        </h1>
+{/* Input section */}
 
-        <p className="mt-1 text-sm text-gray-400">
-          Detailed breakdown for <span className="text-indigo-400">Senior Product Designer · Figma</span>
-        </p>
-      </div>
+<Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
 
-      {/* MAIN GRID */}
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+<div className="grid gap-6 md:grid-cols-2">
 
-        {/* LEFT PANEL */}
-        <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+<div>
 
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+<label className="text-sm text-gray-300">
+Paste Resume
+</label>
 
-            {/* Score Section */}
-            <div className="flex flex-col items-center md:items-start gap-4">
+<textarea
+rows={10}
+value={resumeText}
+onChange={(e)=>setResumeText(e.target.value)}
+className="mt-2 w-full rounded-xl bg-transparent border border-white/20 px-4 py-3 text-sm"
+placeholder="Paste your resume text here"
+/>
 
-              <ATSProgressCircle score={score} />
+</div>
 
-              <p className={`text-3xl font-bold ${scoreColor}`}>
-                {score} / 100
-              </p>
+<div>
 
-              <Button
-                onClick={rerunAnalysis}
-                disabled={loading}
-                className="px-6 py-2 text-xs bg-gradient-to-r from-indigo-500 to-purple-600 border-0 hover:scale-105 transition disabled:opacity-60"
-              >
-                {loading ? 'Re-running...' : 'Re-run analysis'}
-              </Button>
+<label className="text-sm text-gray-300">
+Paste Job Description
+</label>
 
-            </div>
+<textarea
+rows={10}
+value={jobDescription}
+onChange={(e)=>setJobDescription(e.target.value)}
+className="mt-2 w-full rounded-xl bg-transparent border border-white/20 px-4 py-3 text-sm"
+placeholder="Paste the job description"
+/>
 
-            {/* Summary Cards */}
-            <div className="grid gap-4 text-xs md:w-[60%]">
+</div>
 
-              <div className="rounded-xl bg-white/5 border border-white/10 backdrop-blur p-4">
-                <p className="text-[11px] uppercase tracking-wider text-indigo-400">
-                  Overall match quality
-                </p>
-                <p className="mt-2 text-sm font-semibold text-white">
-                  Strong alignment with job description
-                </p>
-                <p className="mt-1 text-gray-400">
-                  Your experience reflects core responsibilities and skill expectations.
-                </p>
-              </div>
+</div>
 
-              <div className="rounded-xl bg-white/5 border border-white/10 backdrop-blur p-4">
-                <p className="text-[11px] uppercase tracking-wider text-purple-400">
-                  Screening likelihood
-                </p>
-                <p className="mt-2 text-sm font-semibold text-white">
-                  High probability of recruiter visibility
-                </p>
-                <p className="mt-1 text-gray-400">
-                  Improve keyword density to push score above 90.
-                </p>
-              </div>
+<div className="mt-6">
 
-            </div>
-          </div>
-        </Card>
+<Button
+onClick={analyzeATS}
+className="px-6 py-2 text-sm bg-gradient-to-r from-indigo-500 to-purple-600 border-0 hover:scale-105 transition"
+>
+{loading ? "Analyzing..." : "Analyze ATS Score"}
+</Button>
 
-        {/* RIGHT PANEL */}
-        <div className="space-y-6">
+</div>
 
-          {/* Matched Keywords */}
-          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
-            <h3 className="text-xs uppercase tracking-[0.25em] text-emerald-400">
-              Keyword match
-            </h3>
+</Card>
 
-            <div className="mt-4 flex flex-wrap gap-3 text-xs">
-              {matchedKeywords.map((kw) => (
-                <span
-                  key={kw}
-                  className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-4 py-1 text-emerald-400 font-medium"
-                >
-                  {kw}
-                </span>
-              ))}
-            </div>
-          </Card>
+{/* Results */}
 
-          {/* Missing Keywords */}
-          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
-            <h3 className="text-xs uppercase tracking-[0.25em] text-amber-400">
-              Missing keywords
-            </h3>
+<Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
 
-            <div className="mt-4 flex flex-wrap gap-3 text-xs">
-              {missingKeywords.map((kw) => (
-                <span
-                  key={kw}
-                  className="rounded-full bg-amber-500/10 border border-amber-500/20 px-4 py-1 text-amber-400 font-medium"
-                >
-                  {kw}
-                </span>
-              ))}
-            </div>
-          </Card>
+<div className="flex flex-col md:flex-row gap-8">
 
-          {/* Suggestions */}
-          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
-            <h3 className="text-xs uppercase tracking-[0.25em] text-indigo-400">
-              Improvement suggestions
-            </h3>
+<div className="flex flex-col items-center">
 
-            <ul className="mt-4 space-y-3 text-xs text-gray-300">
-              <li>• Add quantified experimentation metrics (A/B tests, conversion uplift).</li>
-              <li>• Highlight accessibility practices (WCAG, inclusive design).</li>
-              <li>• Mention cross-functional collaboration in 2–3 bullets.</li>
-            </ul>
-          </Card>
+<ATSProgressCircle score={score} />
 
-        </div>
-      </div>
-    </div>
-  );
+<p className={`mt-4 text-3xl font-bold ${scoreColor}`}>
+{score} / 100
+</p>
+
+</div>
+
+<div className="flex-1 grid gap-6 md:grid-cols-2">
+
+{/* Matched */}
+
+<div>
+
+<h3 className="text-xs uppercase tracking-wider text-emerald-400">
+Matched Keywords
+</h3>
+
+<div className="mt-3 flex flex-wrap gap-2">
+
+{matchedKeywords.length === 0 && (
+<p className="text-gray-400 text-sm">
+No matches yet
+</p>
+)}
+
+{matchedKeywords.map((word)=>(
+<span
+key={word}
+className="text-xs bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-emerald-400"
+>
+{word}
+</span>
+))}
+
+</div>
+
+</div>
+
+{/* Missing */}
+
+<div>
+
+<h3 className="text-xs uppercase tracking-wider text-amber-400">
+Missing Keywords
+</h3>
+
+<div className="mt-3 flex flex-wrap gap-2">
+
+{missingKeywords.length === 0 && (
+<p className="text-gray-400 text-sm">
+No missing keywords
+</p>
+)}
+
+{missingKeywords.map((word)=>(
+<span
+key={word}
+className="text-xs bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full text-amber-400"
+>
+{word}
+</span>
+))}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</Card>
+
+</div>
+
+);
+
 };
 
 export default ATSPage;

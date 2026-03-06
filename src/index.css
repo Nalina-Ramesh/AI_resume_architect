@@ -238,3 +238,42 @@ body {
 .animate-dropdown {
   animation: dropdown 0.18s ease-out;
 }
+
+@keyframes cf-float-slow {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes cf-float-fast {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-cf-float-slow {
+  animation: cf-float-slow 4.6s ease-in-out infinite;
+}
+
+.animate-cf-float-fast {
+  animation: cf-float-fast 3.2s ease-in-out infinite;
+}
+
+.cf-dash-flow {
+  stroke-dasharray: 8 8;
+  animation: cf-dash-move 9s linear infinite;
+}
+
+@keyframes cf-dash-move {
+  to {
+    stroke-dashoffset: -160;
+  }
+}

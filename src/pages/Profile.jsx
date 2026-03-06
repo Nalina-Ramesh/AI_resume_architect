@@ -92,16 +92,40 @@ const Profile = () => {
 };
 
 export default Profile;*/
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { clearStoredAuth, readStoredUser, userInitial } from '../utils/authUser';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(() => readStoredUser());
+
+  useEffect(() => {
+    const syncUser = () => setUser(readStoredUser());
+
+    window.addEventListener('auth-user-updated', syncUser);
+    window.addEventListener('storage', syncUser);
+
+    return () => {
+      window.removeEventListener('auth-user-updated', syncUser);
+      window.removeEventListener('storage', syncUser);
+    };
+  }, []);
+
+  const userMeta = useMemo(() => {
+    const name = user?.name?.trim() || 'My Account';
+    const email = user?.email?.trim() || 'Email not available';
+    return {
+      name,
+      email,
+      initial: userInitial(name, 'A'),
+    };
+  }, [user]);
 
   const handleLogout = () => {
-    // Placeholder logout logic
+    clearStoredAuth();
     navigate('/login');
   };
 
@@ -140,33 +164,37 @@ const Profile = () => {
             Profile Details
           </h2>
 
+          <div className="mt-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-sm font-semibold text-white">
+            {userMeta.initial}
+          </div>
+
           <div className="mt-6 grid gap-6 text-sm md:grid-cols-2">
 
             <div>
               <p className="text-xs text-gray-400">Name</p>
               <p className="mt-1 text-white font-medium">
-                Alex Candidate
+                {userMeta.name}
               </p>
             </div>
 
             <div>
               <p className="text-xs text-gray-400">Email</p>
               <p className="mt-1 text-white font-medium">
-                alex.candidate@example.com
+                {userMeta.email}
               </p>
             </div>
 
             <div>
               <p className="text-xs text-gray-400">Role</p>
               <p className="mt-1 text-white font-medium">
-                Product Designer
+                Candidate
               </p>
             </div>
 
             <div>
               <p className="text-xs text-gray-400">Timezone</p>
               <p className="mt-1 text-white font-medium">
-                GMT+5:30
+                {Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local timezone'}
               </p>
             </div>
 
@@ -178,7 +206,7 @@ const Profile = () => {
               variant="outline"
               className="px-5 py-2 text-xs border-white/20 text-gray-300 hover:bg-white/10"
             >
-              Edit profile
+              Edit profile (soon)
             </Button>
 
             <Button
@@ -248,9 +276,9 @@ const Profile = () => {
             </h3>
 
             <ul className="mt-5 space-y-3 text-sm text-gray-300">
-              <li>• Last login: 2 hours ago · Chrome on Windows</li>
-              <li>• 3 resumes edited this week</li>
-              <li>• 5 ATS analyses and 2 cover letters generated</li>
+              <li>• Last login: Current session</li>
+              <li>• Resume and ATS activity will appear here</li>
+              <li>• Security events dashboard is coming soon</li>
             </ul>
 
           </Card>

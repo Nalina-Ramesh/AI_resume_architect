@@ -17,9 +17,6 @@ import Chatbot from './pages/chatbot';
 import History from './pages/history';
 
 const App = () => {
-  // UI-only placeholder – replace with real auth later
-  const isAuthenticated = true;
-
   return (
     <div className="app-shell min-h-screen">
       <Routes>
@@ -33,7 +30,7 @@ const App = () => {
         <Route
           path="/app"
           element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <ProtectedRoute>
               <DashboardLayout />
             </ProtectedRoute>
           }

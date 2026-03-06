@@ -1,25 +1,54 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { clearStoredAuth, readStoredUser, userInitial } from '../utils/authUser';
 
 const UserDropdown = () => {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
+  const syncUserFromStorage = () => {
+    const nextUser = readStoredUser();
+    setUser(nextUser);
+
+    if (import.meta.env.DEV) {
+      console.log('[Auth] User dropdown synced:', nextUser?.email || 'guest');
+    }
+  };
+
   useEffect(() => {
+    syncUserFromStorage();
+
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpen(false);
       }
     };
 
+    const handleAuthUpdate = () => {
+      syncUserFromStorage();
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('auth-user-updated', handleAuthUpdate);
+    window.addEventListener('storage', handleAuthUpdate);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('auth-user-updated', handleAuthUpdate);
+      window.removeEventListener('storage', handleAuthUpdate);
+    };
   }, []);
 
   const handleLogout = () => {
+    clearStoredAuth();
     navigate('/login');
   };
+
+  const displayName = user?.name?.trim() || 'My Account';
+  const displayEmail = user?.email?.trim() || 'Email not available';
+  const avatarLetter = userInitial(displayName);
 
   const MenuItem = ({ label, onClick, danger }) => (
     <button
@@ -49,7 +78,7 @@ const UserDropdown = () => {
         onClick={() => setOpen(!open)}
         className="relative h-11 w-11 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center font-semibold text-white shadow-xl transition-all duration-300 hover:scale-110"
       >
-        U
+        {avatarLetter}
 
         {/* Online dot */}
         <span className="absolute bottom-1 right-1 h-3 w-3 rounded-full bg-emerald-400 border-2 border-[#0f0f13]" />
@@ -67,10 +96,10 @@ const UserDropdown = () => {
             {/* Header */}
             <div className="px-4 py-4 border-b border-white/10">
               <p className="text-sm font-semibold text-white">
-                Alex Candidate
+                {displayName}
               </p>
               <p className="text-xs text-gray-400 mt-1">
-                alex.candidate@example.com
+                {displayEmail}
               </p>
             </div>
 
@@ -100,8 +129,8 @@ const UserDropdown = () => {
               />
 
               <MenuItem
-                label="Lock Screen"
-                onClick={() => navigate('/app/landing')}
+                label="Go to Home"
+                onClick={() => navigate('/app/home')}
               />
 
               <div className="my-2 border-t border-white/10" />
