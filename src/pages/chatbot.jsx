@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import API from '../api/api';
 
 const nowTime = () =>
   new Date().toLocaleTimeString([], {
@@ -9,40 +10,14 @@ const nowTime = () =>
 const initialConversations = [
   {
     id: 1,
-    title: 'Resume bullets for product role',
-    updatedAt: 'Today · 18:20',
+    title: 'New conversation',
+    updatedAt: `Today · ${nowTime()}`,
     messages: [
       {
         id: 1,
         role: 'ai',
-        text: 'Hi! I’m your CareerForge AI assistant. I can help optimize your resume, improve ATS score, and prepare better applications.',
+        text: 'Hi! I’m your CareerForge AI assistant. Ask me to improve ATS score, rewrite bullets, or tailor your resume to a job description.',
         time: nowTime(),
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: 'ATS keyword improvement ideas',
-    updatedAt: 'Yesterday · 20:12',
-    messages: [
-      {
-        id: 1,
-        role: 'ai',
-        text: 'Try adding measurable outcomes and role-specific keywords from the JD to improve ATS matching.',
-        time: '08:46 PM',
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: 'Cover letter structure draft',
-    updatedAt: 'Yesterday · 17:05',
-    messages: [
-      {
-        id: 1,
-        role: 'ai',
-        text: 'I can draft a concise cover letter with a strong opening, impact highlights, and tailored closing paragraph.',
-        time: '05:05 PM',
       },
     ],
   },
@@ -95,9 +70,9 @@ const Chatbot = () => {
     setIsTyping(false);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = input.trim();
-    if (!trimmed || !activeConversation) return;
+    if (!trimmed || !activeConversation || isTyping) return;
 
     const userMessage = {
       id: Date.now(),
@@ -123,11 +98,18 @@ const Chatbot = () => {
     setInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
+    try {
+      const response = await API.post('/chat', {
+        message: trimmed,
+        history: activeConversation.messages,
+      });
+
       const aiMessage = {
         id: Date.now() + 1,
         role: 'ai',
-        text: 'Smart suggestion: quantify your impact with one metric, mirror 2–3 role keywords from the job description, and keep each bullet action-first.',
+        text:
+          response?.data?.reply ||
+          'I could not generate a response right now. Please try again.',
         time: nowTime(),
       };
 
@@ -136,9 +118,22 @@ const Chatbot = () => {
         updatedAt: `Today · ${nowTime()}`,
         messages: [...conversation.messages, aiMessage],
       }));
+    } catch {
+      const fallback = {
+        id: Date.now() + 1,
+        role: 'ai',
+        text: 'Service is temporarily unavailable. Please try again in a moment.',
+        time: nowTime(),
+      };
 
+      updateConversation(activeConversation.id, (conversation) => ({
+        ...conversation,
+        updatedAt: `Today · ${nowTime()}`,
+        messages: [...conversation.messages, fallback],
+      }));
+    } finally {
       setIsTyping(false);
-    }, 900);
+    }
   };
 
   const handleCopy = (messageText) => {

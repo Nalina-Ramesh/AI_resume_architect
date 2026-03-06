@@ -1,61 +1,69 @@
-import React, { useMemo, useState } from 'react';
-
-const historyData = [
-  {
-    id: 1,
-    title: 'Resume Optimization Session',
-    preview: 'Improved impact bullets and ATS keyword density for product roles.',
-    date: 'Today · 14:32',
-    bucket: 'Today',
-    count: 18,
-  },
-  {
-    id: 2,
-    title: 'ATS Keyword Analysis',
-    preview: 'Identified missing skills and improved resume-job alignment score.',
-    date: 'Yesterday · 18:05',
-    bucket: 'Yesterday',
-    count: 11,
-  },
-  {
-    id: 3,
-    title: 'Cover Letter Rewrite',
-    preview: 'Generated concise role-specific opening and stronger closing CTA.',
-    date: '2 days ago · 09:10',
-    bucket: 'Older',
-    count: 9,
-  },
-  {
-    id: 4,
-    title: 'Interview Prep Questions',
-    preview: 'Created tailored Q&A set from job description and resume context.',
-    date: '3 days ago · 20:45',
-    bucket: 'Older',
-    count: 14,
-  },
-  {
-    id: 5,
-    title: 'Headline & Summary Refresh',
-    preview: 'Refined positioning statement for senior PM applications.',
-    date: 'Yesterday · 11:20',
-    bucket: 'Yesterday',
-    count: 7,
-  },
-  {
-    id: 6,
-    title: 'Application Strategy Sprint',
-    preview: 'Prioritized roles and generated tailored task checklist.',
-    date: 'Today · 09:50',
-    bucket: 'Today',
-    count: 16,
-  },
-];
+import React, { useEffect, useMemo, useState } from 'react';
+import API from '../api/api';
 
 const filters = ['All', 'Today', 'Yesterday', 'Older'];
+
+const toBucket = (dateValue) => {
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return 'Older';
+  const now = new Date();
+
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startYesterday = new Date(startToday);
+  startYesterday.setDate(startYesterday.getDate() - 1);
+
+  if (date >= startToday) return 'Today';
+  if (date >= startYesterday) return 'Yesterday';
+  return 'Older';
+};
+
+const toReadableDate = (dateValue) => {
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return 'Recently';
+  return date.toLocaleString([], {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
 
 const History = () => {
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+  const [historyData, setHistoryData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        setLoading(true);
+        const res = await API.get('/my-resumes');
+        const resumes = Array.isArray(res?.data) ? res.data : [];
+
+        const mapped = resumes.map((item) => ({
+          id: item._id,
+          title: item.headline || item.title || 'Resume Draft',
+          preview:
+            item.optimizedContent?.slice(0, 120) ||
+            item.resumeText?.slice(0, 120) ||
+            'No preview available',
+          date: toReadableDate(item.updatedAt || item.createdAt),
+          bucket: toBucket(item.updatedAt || item.createdAt),
+          count: typeof item.atsScore === 'number' ? item.atsScore : 0,
+        }));
+
+        setHistoryData(mapped);
+      } catch {
+        setHistoryData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, []);
 
   const filteredHistory = useMemo(() => {
     return historyData.filter((item) => {
@@ -113,6 +121,13 @@ const History = () => {
           </div>
         </div>
 
+        {loading && (
+          <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-sm text-gray-400 backdrop-blur-xl">
+            Loading history...
+          </div>
+        )}
+
+        {!loading && (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filteredHistory.map((item, index) => (
             <article
@@ -142,8 +157,9 @@ const History = () => {
             </article>
           ))}
         </div>
+        )}
 
-        {filteredHistory.length === 0 && (
+        {!loading && filteredHistory.length === 0 && (
           <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-sm text-gray-400 backdrop-blur-xl">
             No history found for this filter. Try another keyword or filter.
           </div>

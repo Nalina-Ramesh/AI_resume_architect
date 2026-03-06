@@ -10,6 +10,10 @@ const steps = ['Personal Info', 'Experience', 'Education', 'Skills', 'Projects']
 
 const ResumeBuilder = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [savedResumeId, setSavedResumeId] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState("classic");
+  const [saving, setSaving] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     headline: '',
@@ -43,24 +47,62 @@ const ResumeBuilder = () => {
   };
 
   const handleSave = async () => {
+    try {
+      setSaving(true);
 
-    try{
-    
-    await API.post("/resume",{
-    ...formData
-    });
-    
-    alert("Resume saved successfully");
-    
-    }catch(err){
-    
-    alert("Error saving resume");
-    
+      const res = await API.post("/resume", {
+        ...formData,
+      });
+
+      const resumeId = res?.data?.resume?._id;
+      if (resumeId) {
+        setSavedResumeId(resumeId);
+      }
+
+      alert("Resume saved successfully");
+      return resumeId;
+    } catch (err) {
+      alert(err?.response?.data?.message || "Error saving resume");
+      return null;
+    } finally {
+      setSaving(false);
     }
-    
-    };
-  const handleDownload = () => {
-    alert('PDF export would trigger here in production.');
+  };
+
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+
+      let resumeId = savedResumeId;
+      if (!resumeId) {
+        resumeId = await handleSave();
+      }
+
+      if (!resumeId) {
+        return;
+      }
+
+      const res = await API.get(`/resume/generate-pdf/${resumeId}`, {
+        responseType: "blob",
+        params: {
+          template: selectedTemplate,
+        },
+      });
+
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "optimized-resume.pdf";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err?.response?.data?.message || "Error downloading PDF");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const progress = ((activeStep + 1) / steps.length) * 100;
@@ -200,9 +242,40 @@ const ResumeBuilder = () => {
           </div>
 
           {/* Buttons */}
-          <div className="mt-8 flex flex-wrap justify-between gap-4">
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
 
             <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="px-5 py-2 text-xs border-white/20 text-gray-300 hover:bg-white/10"
+                onClick={handleBack}
+                disabled={activeStep === 0 || saving || downloading}
+              >
+                Back
+              </Button>
+
+              <Button
+                type="button"
+                className="px-5 py-2 text-xs bg-gradient-to-r from-indigo-500 to-purple-600 border-0 hover:scale-105 transition"
+                onClick={handleNext}
+                disabled={activeStep === steps.length - 1 || saving || downloading}
+              >
+                Next
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+
+              <select
+                value={selectedTemplate}
+                onChange={(e) => setSelectedTemplate(e.target.value)}
+                className="rounded-xl border border-white/20 bg-[#111118] px-3 py-2 text-xs text-white"
+              >
+                <option value="classic">Classic Template</option>
+                <option value="modern">Modern Template</option>
+                <option value="minimal">Minimal Template</option>
+              </select>
 
               <Button
                 type="button"
@@ -218,16 +291,18 @@ const ResumeBuilder = () => {
                 variant="outline"
                 className="px-5 py-2 text-xs border-white/20 text-gray-300 hover:bg-white/10"
                 onClick={handleSave}
+                disabled={saving || downloading}
               >
-                Save Resume
+                {saving ? "Saving..." : "Save Resume"}
               </Button>
 
               <Button
                 type="button"
                 className="px-5 py-2 text-xs bg-gradient-to-r from-indigo-500 to-purple-600 border-0 hover:scale-105 transition"
                 onClick={handleDownload}
+                disabled={saving || downloading}
               >
-                Download PDF
+                {downloading ? "Downloading..." : "Download PDF"}
               </Button>
 
             </div>
@@ -235,7 +310,11 @@ const ResumeBuilder = () => {
         </Card>
 
         {/* RIGHT SIDE PREVIEW */}
-        <ResumePreview data={formData} />
+        <ResumePreview
+          data={formData}
+          selectedTemplate={selectedTemplate}
+          activeStep={activeStep}
+        />
 
       </div>
     </div>
