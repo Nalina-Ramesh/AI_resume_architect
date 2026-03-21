@@ -3,6 +3,7 @@
 An intelligent full-stack web application that helps job seekers optimize their resumes for Applicant Tracking Systems (ATS) and improve their chances of getting shortlisted.
 
 **📌 Overview**
+
 This project enables users to:
 
 Analyze resumes against job descriptions
@@ -14,21 +15,28 @@ Build and preview resumes in real-time
 The platform focuses on improving resume relevance, ATS scores, and interview shortlisting chances.
 
 **✨ Features**
+
 **📊 ATS Score Analysis**
 Evaluate resumes and generate scores with keyword-based insights
+
 **🧠 AI Chatbot**
 Ask questions related to resumes, ATS, and job applications
+
 **✍️ Cover Letter Generator**
 Generate tailored, ATS-friendly cover letters instantly
+
 **🧾 Resume Builder**
 Multi-step form with real-time preview for structured resume creation
+
 **📈 Dashboard & Analytics**
 Track resume performance, history, and improvements
+
 **🔐 Authentication & Protected Routes**
 Secure login/signup system with user-specific data handling
 
-**🛠️ Tech Stack
-Frontend:**
+**🛠️ Tech Stack**
+
+**Frontend:**
 React.js
 TailwindCSS
 React Router
@@ -44,6 +52,7 @@ MongoDB
 AI APIs (for chatbot & content generation)
 
 **🧠 How It Works**
+
 User uploads or builds a resume
 Inputs job description
 System analyzes resume using keyword matching logic
@@ -51,6 +60,7 @@ Generates ATS score and improvement suggestions
 AI tools assist in refining resume and generating cover letters
 
 **⚙️ Installation & Setup**
+
 # Clone the repository
 git clone https://github.com/Nalina-Ramesh/AI_resume_architect.git
 
@@ -67,14 +77,16 @@ npm run dev
 npm start
 
 **🔐 Environment Variables**
+
 Create a .env file and add:
 
 MONGO_URI=your_mongodb_connection_string
 PORT=5000
 JWT_SECRET=your_secret_key
 AI_API_KEY=your_api_key
-**
-🚀 Future Improvements**
+
+**🚀 Future Improvements**
+
 Real AI-based ATS scoring using NLP
 Resume parsing from PDF uploads
 Job matching recommendations
@@ -82,6 +94,7 @@ Multi-language support
 Advanced analytics dashboard
 
 **📚 What I Learned**
+
 Building full-stack MERN applications
 Designing ATS-aware resume optimization systems
 Integrating AI features into real-world applications
